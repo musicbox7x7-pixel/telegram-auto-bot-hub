@@ -1,11 +1,13 @@
 import { useState } from "react";
 import {
   Send, Settings, BarChart3, Rss, Bot, Plus, Play, Pause,
-  Trash2, ExternalLink, Clock, Hash, TrendingUp, Users, Eye
+  Trash2, ExternalLink, Clock, Hash, TrendingUp, Users, Eye,
+  LogOut, Shield, User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
 
 type Channel = {
   id: string;
@@ -53,6 +55,7 @@ const mockPosts: ScheduledPost[] = [
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<"channels" | "sources" | "posts" | "stats">("channels");
+  const { isAdmin, signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,8 +69,9 @@ const Dashboard = () => {
             <span className="font-display text-lg font-bold">TeleBot<span className="text-primary">.pro</span></span>
           </Link>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon"><Settings className="w-4 h-4" /></Button>
-            <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-xs font-bold text-primary-foreground">A</div>
+            <Link to="/profile"><Button variant="ghost" size="icon"><User className="w-4 h-4" /></Button></Link>
+            {isAdmin && <Link to="/admin"><Button variant="ghost" size="icon"><Shield className="w-4 h-4" /></Button></Link>}
+            <Button variant="ghost" size="icon" onClick={signOut}><LogOut className="w-4 h-4" /></Button>
           </div>
         </div>
       </header>
