@@ -2,3 +2,12 @@ project_id = "qadsifmngxeablrojwcd"
 
 [functions.process-payment]
 verify_jwt = false
+
+[functions.parse-sources]
+verify_jwt = false
+
+[functions.publish-posts]
+verify_jwt = false
+
+[functions.schedule-content]
+verify_jwt = false
