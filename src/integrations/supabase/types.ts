@@ -14,6 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      channels: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          publish_interval_minutes: number
+          telegram_bot_token: string | null
+          telegram_chat_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          publish_interval_minutes?: number
+          telegram_bot_token?: string | null
+          telegram_chat_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          publish_interval_minutes?: number
+          telegram_bot_token?: string | null
+          telegram_chat_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      parsed_content: {
+        Row: {
+          channel_id: string
+          created_at: string
+          id: string
+          is_used: boolean
+          media_urls: Json | null
+          original_text: string
+          processed_text: string | null
+          source_date: string | null
+          source_id: string
+          source_url: string | null
+          user_id: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string
+          id?: string
+          is_used?: boolean
+          media_urls?: Json | null
+          original_text: string
+          processed_text?: string | null
+          source_date?: string | null
+          source_id: string
+          source_url?: string | null
+          user_id: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string
+          id?: string
+          is_used?: boolean
+          media_urls?: Json | null
+          original_text?: string
+          processed_text?: string | null
+          source_date?: string | null
+          source_id?: string
+          source_url?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parsed_content_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parsed_content_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -114,6 +207,122 @@ export type Database = {
           },
         ]
       }
+      scheduled_posts: {
+        Row: {
+          channel_id: string
+          content_id: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          media_urls: Json | null
+          published_at: string | null
+          scheduled_at: string
+          status: Database["public"]["Enums"]["post_status"]
+          telegram_message_id: string | null
+          text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          channel_id: string
+          content_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          media_urls?: Json | null
+          published_at?: string | null
+          scheduled_at: string
+          status?: Database["public"]["Enums"]["post_status"]
+          telegram_message_id?: string | null
+          text: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          channel_id?: string
+          content_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          media_urls?: Json | null
+          published_at?: string | null
+          scheduled_at?: string
+          status?: Database["public"]["Enums"]["post_status"]
+          telegram_message_id?: string | null
+          text?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_posts_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_posts_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "parsed_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sources: {
+        Row: {
+          channel_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          last_parsed_at: string | null
+          name: string
+          posts_collected: number
+          source_type: Database["public"]["Enums"]["source_type"]
+          telegram_source_id: string | null
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_parsed_at?: string | null
+          name: string
+          posts_collected?: number
+          source_type: Database["public"]["Enums"]["source_type"]
+          telegram_source_id?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_parsed_at?: string | null
+          name?: string
+          posts_collected?: number
+          source_type?: Database["public"]["Enums"]["source_type"]
+          telegram_source_id?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sources_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_plans: {
         Row: {
           created_at: string
@@ -187,6 +396,8 @@ export type Database = {
     Enums: {
       app_role: "admin" | "user"
       payment_status: "pending" | "success" | "failed" | "refunded"
+      post_status: "pending" | "published" | "failed" | "skipped"
+      source_type: "telegram" | "rss" | "web"
       subscription_status: "active" | "canceled" | "expired" | "trial"
     }
     CompositeTypes: {
@@ -317,6 +528,8 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "user"],
       payment_status: ["pending", "success", "failed", "refunded"],
+      post_status: ["pending", "published", "failed", "skipped"],
+      source_type: ["telegram", "rss", "web"],
       subscription_status: ["active", "canceled", "expired", "trial"],
     },
   },
